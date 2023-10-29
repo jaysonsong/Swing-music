@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>SWING Music</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Tilt+Neon">
+    <style>
+        * {
+            font-family: "Tilt Neon";
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px;
+            font-size: 50px;
+            background-color: lightslategray;
+	        background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+	        background-size: 400% 400%;
+	        animation: gradient 10s ease infinite;
+            color: #F7F1E5
+        }
+
+        body {
+            margin: 0px 0px 0px 0px;
+            width: 100vw;
+            height: 100vh;
+            background-color: lightslategray;
+	        background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+	        background-size: 400% 400%;
+	        animation: gradient 15s ease infinite;
+            color: #00425A
+        }
+        @keyframes gradient {
+            0% {
+            background-position: 0% 50%;
+            }
+            50% {
+            background-position: 100% 50%;
+            }
+            100% {
+            background-position: 0% 50%;
+            }
+        }
+
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            border: 0px solid #ddd;
+            border-radius: 12px;
+            background-color: #fff8e1;
+            margin: 20px 10px 20px 10px;
+        }
+        .assistant {
+            flex-grow: 1;
+            padding: 10px;
+            margin-left: 10px;
+            margin-right: 100px;
+            align-self: left;
+        }
+        
+        .user {
+            flex-grow: 1;
+            padding: 10px;
+            margin-left: 100px;
+            align-self: right;
+        }
+        .chat {
+            flex-grow: 1;
+            border-radius: 12px;
+            padding: 0px;
+            background-color: #fff8e1;
+        }
+        .user-chat {
+            text-align: right;
+        }
+        .profile-picture {     	  
+            border-radius: 50%;
+        }
+
+        .assistant-profile {
+            background-size: 0px;
+        }
+
+        .user-profile {
+		    background-position: right;
+        }
+        
+        footer {
+	        position : fixed;
+	        bottom : 0;   	  
+            width: 100%;
+            background-color: #EDF1D6;
+            padding: 20px;
+            border-top: 0px solid #ccc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+	        margin-bottom: 0px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            width: 75%;
+            padding: 8px;
+            border: none;
+            border-radius: 4px;
+            outline: none;
+            background-color: #EDF1D6;
+	        color: #000000
+        }
+
+        #button {
+            border-radius: 12px;
+            border: none;
+            padding: 10px 10px 10px 10px ;
+            background-color: #FFB26B;
+            margin-left: 10px;
+        }
+
+        #box {
+            border: 0px solid rgb(75, 96, 105);
+            position: absolute;
+            left: 50%;
+            top: 55%;
+            transform: translate(-50%, -50%);
+            padding: 0px;
+            width: 300px;
+            height: 200px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center; 
+            justify-content: center;    
+        }
+
+        #textarea {
+            border-radius: 12px;
+            padding: 10px 10px 10px 10px;
+            width: 90%;
+            height: 75%;
+            margin-top: 10px;
+            margin-bottom: 15px;
+            background-color: #1a637d;
+	        color: #e7ce55
+        }
+
+        #close {
+            background-color: rgb(150, 180, 114);
+            color: rgb(30, 1, 37); 
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+    <script src="socket.io/socket.io.js"></script>
+</head>
+
+<body>
+    <div id="box">
+        <font color="white"><p>Tell Me About Yourself!</p></font>
+        <textarea id="textarea"></textarea>
+        <button id="close">Save</button>
+    </div>
+    <br><br>
+    <center><b><font size="50" face="Tilt Neon">SWING Music</font></b></center><br><br>
+    
+
+    <div id="all-chats">
+    </div>
+    <footer>
+        <input type="text" placeholder="Type your message here..." id="chat">
+        <button id="button">Suggest Videos</button>
+    </footer>
+
+    <script>
+        let chatID = 0;
+        function getChatHTML(user, message) {
+            return `
+    <div class="chat-container ${user}">
+        <div class="profile-picture ${user}-profile"></div>
+        <div class="chat ${user}-chat" id="chat_number_${++chatID}">${message}</div>
+    </div> `;
+        }
+
+        function $(e) { return document.getElementById(e); }
+
+        function addChat(user, message) {
+            $("all-chats").innerHTML += getChatHTML(user, message);
+        }
+        function appendToChat(message) {
+            $("chat_number_" + chatID).innerHTML += message;
+        }
+
+        let socket = io();
+
+        $("chat").addEventListener("change", () => {
+            let val = $("chat").value;
+            $("chat").value = "";
+            $("chat").disabled = true;
+
+            addChat("user", val);
+            addChat("assistant", "");
+
+            socket.emit("chat-message", val);
+        });
+
+        socket.on("chat-token", (token) => {
+            appendToChat(token);
+        });
+        socket.on("chat-finished", () => {
+            $("chat").disabled = false;
+        });
+
+        $("button").addEventListener("click", () => {
+            addChat("assistant", "Sure! I'd be happy to suggest a few music videos for you to enjoy!");
+            socket.emit("suggest-videos");
+        });
+
+        socket.on("youtube-result", (result) => {
+            addChat("assistant", "");
+            if (result.items.length > 0) {
+                appendToChat(`<iframe src="https://www.youtube.com/embed/${result.items[0].id}"></iframe>`);
+            } else {
+                appendToChat("Couldn't find video :(");
+            }
+        });
+
+        // BOX CODE
+        $("close").addEventListener("click", () => {
+            $("box").style.display = "none";
+
+            socket.emit("user-info", $("textarea").value);
+        });
+        $("button2").addEventListener("click", () => showBox());
+        function showBox() {
+            $("box").style.display = "block";
+        }
+        // END BOX CODE
+
+    </script>
+</body>
+
+</html>

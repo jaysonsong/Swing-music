@@ -1,0 +1,52 @@
+Instruction for installing SWING Music
+
+
+1. INSTALL Node.js (https://nodejs.org/en/download/current) — any version is OK
+
+2. Create new folder for the app 
+
+3. Copy files from “ai3.zip” into folder (https://cdn.discordapp.com/attachments/1123736811785691227/1166965329663102976/ai3.zip?ex=654c6827&is=6539f327&hm=b559bad1e080368ae31e333cea0fc6f635738f8b9ccb354bb8f1b1400563e444&)  
+
+
+4. Download https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGML/blob/main/llama-2-7b-chat.ggmlv3.q4_0.bin 
+
+
+IMPORTANT: file name must be “llama-2-7b-chat.ggmlv3.q4_0.bin”
+
+
+5. Open terminal in that folder 
+
+
+IMPORTANT: terminal must be pointing to that folder, it cannot point anywhere else 
+
+
+Folder should look like this: (VERY IMPORTANT that your terminal points to the right location)
+  
+
+
+
+6. Install npm packages listed below (copy and paste into terminal)
+
+
+npm install express @llama-node/llama-cpp llama-node youtube-search-api compromise sentiment socket.io 
+
+
+7. Edit the file package.json to include this line 
+
+
+8. Run the server using the following command: node chatbot-server3.js 
+
+
+Expected output is below (should be similar — does not have to be 100% same)
+  
+
+
+9. Open your browser to http://localhost:3004/chat.html
+
+
+________________
+
+
+Troubleshooting 
+“App is running too slow”
+Usually caused by limited RAM on your computer (<= 8 GB). Modify this line in “core-ai3.js” to true
